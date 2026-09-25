@@ -1,4 +1,44 @@
 /* Installed inside the existing act-four scene; no main-story or afterword changes. */
+(() => {
+  const mobileStyle = document.createElement('style');
+  mobileStyle.textContent = `
+    html{-webkit-tap-highlight-color:transparent}
+    button,a,[role="button"]{-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
+    button:focus:not(:focus-visible),a:focus:not(:focus-visible){outline:none}
+  `;
+  document.head.append(mobileStyle);
+
+  for (const [name, content] of [
+    ['apple-mobile-web-app-capable', 'yes'],
+    ['apple-mobile-web-app-status-bar-style', 'black-translucent']
+  ]) {
+    if (!document.querySelector(`meta[name="${name}"]`)) {
+      const meta = document.createElement('meta');
+      meta.name = name;
+      meta.content = content;
+      document.head.append(meta);
+    }
+  }
+
+  addEventListener('DOMContentLoaded', () => {
+    if (!document.documentElement.requestFullscreen) return;
+    const controls = document.querySelector('#cloud-drift .viz-controls');
+    if (!controls || controls.querySelector('.fullscreen-button')) return;
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'btn fullscreen-button';
+    button.textContent = '全屏';
+    button.addEventListener('click', async () => {
+      if (document.fullscreenElement) await document.exitFullscreen();
+      else await document.documentElement.requestFullscreen();
+    });
+    document.addEventListener('fullscreenchange', () => {
+      button.textContent = document.fullscreenElement ? '退出全屏' : '全屏';
+    });
+    controls.append(button);
+  });
+})();
+
 window.installEasterEgg = function ({root, stage, setPhase, wait, buttonArt}) {
   const asset = name => new URL('./' + name, document.baseURI).href;
   // Coordinates refer to the existing 1536 × 1024 carriage artwork.
@@ -23,10 +63,12 @@ window.installEasterEgg = function ({root, stage, setPhase, wait, buttonArt}) {
   const used=new Set(), buttons=new Map(), patches=new Map();
   const prepared=new Map();
   const background=new Image(), clean=new Image();
-  background.src=asset('carriage.png');clean.src=asset('carriage-clean.png');
-  // Start decoding eagerly, but handle loading failures at the entry point.
-  const ready=Promise.all([background.decode(),clean.decode()]);ready.catch(()=>{});
-  const eggMusic=new Audio(asset('easter-egg.mp4'));eggMusic.loop=true;eggMusic.preload='auto';eggMusic.volume=0;
+  let ready=null;
+  function loadCarriage(){
+    if(!ready){background.src=asset('carriage.png');clean.src=asset('carriage-clean.png');ready=Promise.all([background.decode(),clean.decode()]);ready.catch(()=>{});}
+    return ready;
+  }
+  const eggMusic=new Audio(asset('easter-egg.mp4'));eggMusic.loop=true;eggMusic.preload='none';eggMusic.volume=0;
   let musicGeneration=0,musicFade=null;
   function fadeMusicTo(target,duration,token){
     if(musicFade)cancelAnimationFrame(musicFade);const from=eggMusic.volume,start=performance.now();
@@ -85,7 +127,7 @@ window.installEasterEgg = function ({root, stage, setPhase, wait, buttonArt}) {
   }
   async function start(){
     if(active)return;active=true;startEggMusic();
-    try{await ready;await Promise.all(clues.filter(c=>!used.has(c.id)).map(async c=>{prepared.set(c.id,await preparePapers(c));}));if(!view)build();view.hidden=false;stage.querySelector('.birthday-letter')?.setAttribute('inert','');state('EASTER_EGG_CLUE_IDLE');syncButtons();view.focus({preventScroll:true});}
+    try{await loadCarriage();if(!view)build();view.hidden=false;stage.querySelector('.birthday-letter')?.setAttribute('inert','');state('EASTER_EGG_CLUE_IDLE');syncButtons();view.focus({preventScroll:true});}
     catch(error){active=false;stopEggMusic();throw error;}
   }
   async function preparePapers(clue){
@@ -137,4 +179,3 @@ window.installEasterEgg = function ({root, stage, setPhase, wait, buttonArt}) {
   stage.addEventListener('letter-extra',()=>start().catch(report));
   return {start, paperLayout, snapshot:()=>({state:root.dataset.easterEggState,used:[...used],selected:selected?.id,locked})};
 };
-
