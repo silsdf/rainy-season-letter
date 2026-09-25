@@ -779,7 +779,7 @@ function updateTarget(){if(gameState!=='PLAYING'||pointerId===null||targeted?.st
 
 function finishLifted(){const before=clothes.length;clothes=clothes.filter(cloth=>cloth.state!=='LIFTING'||cloth.lift<1);if(clothes.length!==before){root.dataset.clothesActive=String(clothes.length);if(!clothes.length)completeGame();}}
 
-function completeGame(){gameState='LAUNDRY_COMPLETE';if(frame)cancelAnimationFrame(frame);frame=0;last=0;root.__stopOpeningRain?.();root.dataset.state='LAUNDRY_COMPLETE';root.dataset.laundryState='LAUNDRY_COMPLETE';pointerId=null;targeted=null;targetTip={x:.5,y:1.22};completedAt=performance.now();hideGuide();}
+function completeGame(){gameState='LAUNDRY_COMPLETE';if(frame)cancelAnimationFrame(frame);frame=0;last=0;root.dataset.state='LAUNDRY_COMPLETE';root.dataset.laundryState='LAUNDRY_COMPLETE';pointerId=null;targeted=null;targetTip={x:.5,y:1.22};completedAt=performance.now();hideGuide();}
 
 function drawBackground(){if(courtyardArt.complete&&courtyardArt.naturalWidth)gameCtx.drawImage(courtyardArt,0,0,width,height);}
 
@@ -1481,7 +1481,7 @@ function tick(now){
 
   if(m>=BLACK_SYNC_TIME){
 
-   blackAt=m;phase='black';root.dataset.state='PURE_BLACK';root.dataset.blackMusicTime=m.toFixed(4);
+   blackAt=m;phase='black';root.dataset.state='PURE_BLACK';root.dataset.blackMusicTime=m.toFixed(4);root.__stopOpeningRain?.();
 
    root.querySelector('.rain-canvas').style.opacity=0;remainingLights=[];
 
