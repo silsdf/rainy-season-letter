@@ -65,7 +65,7 @@ window.installEasterEgg = function ({root, stage, setPhase, wait, buttonArt}) {
   const background=new Image(), clean=new Image();
   let ready=null;
   function loadCarriage(){
-    if(!ready){background.src=asset('carriage.png');clean.src=asset('carriage-clean.png');ready=Promise.all([background.decode(),clean.decode()]);ready.catch(()=>{});}
+    if(!ready){background.src=asset('carriage.webp');clean.src=asset('carriage-clean.webp');ready=Promise.all([background.decode(),clean.decode()]);ready.catch(()=>{});}
     return ready;
   }
   const eggMusic=new Audio(asset('easter-egg.mp4'));eggMusic.loop=true;eggMusic.preload='none';eggMusic.volume=0;
@@ -132,7 +132,7 @@ window.installEasterEgg = function ({root, stage, setPhase, wait, buttonArt}) {
   }
   async function preparePapers(clue){
     return Promise.all(paperLayout.map(async layout=>{
-      const img=new Image();img.src=layout.src||asset(clue.pair+(layout.kind==='photo'?'.jpg':'.png'));img.alt=clue.label+(layout.kind==='photo'?'照片':'剪贴记忆卡');await img.decode();
+      const img=new Image();img.src=layout.src||asset(clue.pair+(layout.kind==='photo'?'.jpg':'.webp'));img.alt=clue.label+(layout.kind==='photo'?'照片':'剪贴记忆卡');await img.decode();
       const paper=document.createElement('figure');paper.className='egg-paper '+layout.kind;paper.dataset.kind=layout.kind;
       const ratio=img.naturalWidth/img.naturalHeight,width=Math.min(layout.maxWidth,layout.maxHeight*ratio/1.5),height=width*1.5/ratio;
       Object.assign(paper.style,{left:layout.x+'%',top:layout.y+'%',width:width+'%',height:height+'%'});paper.style.setProperty('--rotation',layout.rotation+'deg');paper.append(img);return {paper,layout};
