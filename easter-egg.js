@@ -1,6 +1,6 @@
 /* Installed inside the existing act-four scene; no main-story or afterword changes. */
 window.installEasterEgg = function ({root, stage, setPhase, wait, buttonArt}) {
-  const asset = name => new URL('./assets/easter-egg/' + name, document.baseURI).href;
+  const asset = name => new URL('./' + name, document.baseURI).href;
   // Coordinates refer to the existing 1536 × 1024 carriage artwork.
   const clues = [
     {id:'jupiter', label:'木星', pair:'木星', rect:[98,204,96,94]},
@@ -137,3 +137,4 @@ window.installEasterEgg = function ({root, stage, setPhase, wait, buttonArt}) {
   stage.addEventListener('letter-extra',()=>start().catch(report));
   return {start, paperLayout, snapshot:()=>({state:root.dataset.easterEggState,used:[...used],selected:selected?.id,locked})};
 };
+
